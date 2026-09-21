@@ -12,18 +12,18 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt update
-          sudo apt install -y tmate curl unzip sudo net-tools
+          sudo apt install -y curl unzip sudo net-tools
       - name: Install Tailscale
         run: |
           curl -fsSL https://tailscale.com/install.sh | sh
-      - name: Start Tailscale
+      - name: Start Tailscale with SSH
         run: |
           sudo tailscaled &
           sleep 8
-          sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }} --hostname=vps-github
-      - name: Start tmate session for SSH access
-        uses: mxschmitt/action-tmate@v3
-      - name: Show Tailscale IP and tmate info
+          sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }} --hostname=vps-github --ssh
+      - name: Show Tailscale IP
         run: |
-          echo "Tailscale IP:"
+          echo "Ваш Tailscale IP-адрес:"
           tailscale ip -4
+      - name: Keep session alive for 6 hours
+        run: sleep 21600
