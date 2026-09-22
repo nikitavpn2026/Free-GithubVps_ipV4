@@ -18,6 +18,7 @@ jobs:
           curl -fsSL https://tailscale.com/install.sh | sh
       - name: Start Tailscale with SSH
         run: |
+          sudo pkill tailscaled || true
           sudo tailscaled &
           sleep 8
           sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }} --hostname=vps-github --ssh
