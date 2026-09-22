@@ -19,8 +19,16 @@ jobs:
       - name: Start Tailscale with SSH
         run: |
           sudo pkill tailscaled || true
+          sudo rm -f /var/run/tailscale/tailscaled.sock || true
           sudo tailscaled &
-          sleep 8
+          echo "Ожидание запуска Tailscale..."
+          for i in {1..30}; do
+            if [ -S /var/run/tailscale/tailscaled.sock ]; then
+              echo "Tailscale готов!"
+              break
+            fi
+            sleep 1
+          done
           sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }} --hostname=vps-github --ssh
       - name: Show Tailscale IP
         run: |
