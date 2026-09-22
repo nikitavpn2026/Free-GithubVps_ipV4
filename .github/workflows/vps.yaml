@@ -12,13 +12,20 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt update
-          sudo apt install -y curl unzip sudo net-tools
+          sudo apt install -y curl unzip sudo net-tools openssh-server
+      - name: Set runner password
+        run: |
+          echo "runner:123456" | sudo chpasswd
+      - name: Configure SSH
+        run: |
+          sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+          sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+          sudo systemctl restart ssh
       - name: Tailscale
         uses: tailscale/github-action@v2
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
           hostname: vps-github
-          ssh: true
       - name: Show Tailscale IP
         run: |
           sleep 5
