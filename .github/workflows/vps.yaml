@@ -13,25 +13,15 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y curl unzip sudo net-tools
-      - name: Install Tailscale
-        run: |
-          curl -fsSL https://tailscale.com/install.sh | sh
-      - name: Start Tailscale with SSH
-        run: |
-          sudo pkill tailscaled || true
-          sudo rm -f /var/run/tailscale/tailscaled.sock || true
-          sudo tailscaled &
-          echo "Ожидание запуска Tailscale..."
-          for i in {1..30}; do
-            if [ -S /var/run/tailscale/tailscaled.sock ]; then
-              echo "Tailscale готов!"
-              break
-            fi
-            sleep 1
-          done
-          sudo tailscale up --authkey ${{ secrets.TAILSCALE_AUTHKEY }} --hostname=vps-github --ssh
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          hostname: vps-github
+          ssh: true
       - name: Show Tailscale IP
         run: |
+          sleep 5
           echo "Ваш Tailscale IP-адрес:"
           tailscale ip -4
       - name: Keep session alive for 6 hours
